@@ -1,11 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-import BlockContainer from './BlockContainer';
+import Button from './components/Button';
 
 function App() {
   return (
-    <div className="App">
-      <BlockContainer />
+    <div className='flex flex-wrap items-center gap-2 md:flex-row'>
+      <Button />
     </div>
   );
 }
