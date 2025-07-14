@@ -1,11 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
-import Button from './components/Button';
+import Header from './components/Header';
 
 function App() {
   return (
-    <div className='flex flex-wrap items-center gap-2 md:flex-row'>
-      <Button />
+    <div>
+      <Header />
     </div>
   );
 }

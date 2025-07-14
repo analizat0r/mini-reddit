@@ -1,11 +1,15 @@
-const { v4: uuidv4 } = require('uuid');
+//const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
 const RANDOM_STRING = uuidv4();
 const CLIENT_ID = "exh5IqGa3I425saNed4SRA";
 const endpoint = "/api/v1/me";
 const SCOPE_STRING = "identity";
+const URI = "http://localhost:3000";
 
-const getTokenUrl = `https://www.reddit.com/api/v1/authorize?client_id=${CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=URI&duration=permanent&scope=${SCOPE_STRING}`;
+const getTokenUrl = `https://www.reddit.com/api/v1/authorize?client_id=${CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${URI}&duration=permanent&scope=${SCOPE_STRING}`;
+console.log(getTokenUrl);
+
 
 async function getData() {
   const url = getTokenUrl;
@@ -23,6 +27,6 @@ async function getData() {
   }
 }
 
-getData();
+export default getData;
 
-//bad as i should open this link via browser to give an access only then i will get the access token
+//Need to refactor this to not use fetch(), but instead redirect user to the URL to use window.location.href
