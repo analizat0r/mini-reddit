@@ -1,32 +1,61 @@
 //const { v4: uuidv4 } = require('uuid');
 import { v4 as uuidv4 } from 'uuid';
 
-const RANDOM_STRING = uuidv4();
 const CLIENT_ID = "exh5IqGa3I425saNed4SRA";
-const endpoint = "/api/v1/me";
 const SCOPE_STRING = "identity";
+const CLIENT_SECRET = "XpJHLNSv0H_gLKwRDaIGnypfzXMMrQ";
 const URI = "http://localhost:3000";
-
-const getTokenUrl = `https://www.reddit.com/api/v1/authorize?client_id=${CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${URI}&duration=permanent&scope=${SCOPE_STRING}`;
-console.log(getTokenUrl);
+const baseURL = "https://www.reddit.com/api/v1";
 
 
-async function getData() {
-  const url = getTokenUrl;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
+let accessToken;
 
-    const json = await response;
-    const formatedResponse = json.cookies.map(i => {console.log(i)})
-    console.log(formatedResponse);
-  } catch (error) {
-    console.error(error.message);
+async function getAccessToken() {
+  if (accessToken) {
+    return accessToken;
   }
-}
 
-export default getData;
+  const RANDOM_STRING = uuidv4();
+  const requestParams = `?client_id=${CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${URI}&duration=permanent&scope=${SCOPE_STRING}`;
+  const authorizationURL = baseURL+"/authorize"+requestParams;
 
-//Need to refactor this to not use fetch(), but instead redirect user to the URL to use window.location.href
+  window.location.href = authorizationURL;
+  const urlParams = new URLSearchParams(window.location.search);
+  const responseCode = urlParams.get('code');
+  const responseState = urlParams.get('state');
+
+  if (responseState === RANDOM_STRING) {
+    const endpoint = "/access_token";
+    const url = baseURL + endpoint;
+    
+    // Base64 encoding of user credentials
+    const encodedCreds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
+
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": `Basic ${encodedCreds}`
+    };
+
+    const body = new URLSearchParams({
+      grant_type : "authorization_code",
+      code : responseCode,
+      redirect_uri : URI
+    });
+
+    try {
+      const response = await fetch(url, { 
+        method: "POST", 
+        headers: headers,
+        body: body.toString() 
+      }); 
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        return console.log(jsonResponse);
+      }
+    } catch (error) {
+        console.log(error);
+      } 
+  }    
+
+};
+export default getAccessToken;

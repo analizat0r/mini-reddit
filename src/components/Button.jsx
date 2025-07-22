@@ -1,11 +1,11 @@
 import React from "react";
 import '../App.css';
-import oauth from '../utils/oauth'
+import redirectToReddit from '../utils/auth'
 
 function Button() {
 
     function handleSubmit() {
-        oauth();
+        redirectToReddit();
     }
 
     return (
@@ -16,3 +16,6 @@ function Button() {
 };
 
 export default Button;
+
+
+

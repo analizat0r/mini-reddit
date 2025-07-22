@@ -5,7 +5,7 @@ function Header() {
     return (
         <div className="flex items-center h-20 bg-amber-600">
             <div>
-                 <a href="#">LOGO</a>
+                 <a href="#">MINI REDDIT</a>
                 <Button />
             </div>
         </div>
