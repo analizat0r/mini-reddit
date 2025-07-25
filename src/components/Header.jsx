@@ -1,14 +1,12 @@
 import React from "react";
 import Button from './Button';
 
-function Header() {
+function Header({handleLogin}) {
     return (
-        <div className="flex items-center h-20 bg-amber-600">
-            <div>
-                 <a href="#">MINI REDDIT</a>
-                <Button />
-            </div>
-        </div>
+        <header className="flex justify-between items-center px-4 py-2 bg-white shadow">
+            <div className="text-xl font-bold">Mini Reddit</div>
+            <Button handleLogin={handleLogin}/>
+        </header>
     )
 }
 
