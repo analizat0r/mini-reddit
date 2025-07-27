@@ -1,9 +1,14 @@
 import './App.css';
 import Header from './components/Header';
-import redirectToReddit from '../src/utils/auth'
+import { redirectToReddit, handleRedirectCallback } from './api/reddit'
+import { useEffect } from 'react';
 
 function App() {
   
+  useEffect(() => {
+    handleRedirectCallback();
+  },[]);
+
   function handleLogin(){
     redirectToReddit();
   };
