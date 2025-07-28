@@ -15,14 +15,20 @@ export function redirectToReddit() {
     window.location.href = authorizationURL;
 };
 
+function storeTokens({ access_token, refresh_token, expires_in }) {
+    localStorage.setItem('reddit_access_token', access_token);
+    localStorage.setItem('reddit_refresh_token', refresh_token);
+    localStorage.setItem('reddit_token_expiry', Date.now() + expires_in * 1000);
+}
+
 export async function handleRedirectCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const responseCode = urlParams.get('code');
     const responseState = urlParams.get('state');
     const savedRandomString = localStorage.getItem("reddit_auth_state");
-
+    
     if (responseCode && responseState === savedRandomString) {
-        const encodedCreds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`); // encodes credentials in a format 'username:password' and then encodes it with Base64 to smth like 'bXlVc2VyOm15U2VjcmV0
+        const encodedCreds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`); // encodes credentials in a format 'username:password' and then encodes it with Base64 to smth like 'bXlVc2VyOm15U2VjcmV0'. Required by reddit
         const headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Authorization": `Basic ${encodedCreds}`
@@ -38,12 +44,12 @@ export async function handleRedirectCallback() {
                 method: "POST",
                 headers: headers,
                 body: body.toString()
-
             });
 
             if(response.ok) {
                 const jsonResponse = await response.json();
-                console.log("Access Token Response:", jsonResponse);
+                storeTokens(jsonResponse);
+                window.history.replaceState({}, document.title, window.location.pathname);
             } else {
                 console.error("Failed to fetch token", response.status);
             }
@@ -52,3 +58,44 @@ export async function handleRedirectCallback() {
         }
     }
 };
+
+export async function refreshAccessToken() {
+    const refresh_token = localStorage.getItem('reddit_refresh_token');
+    if (!refresh_token) return;
+    
+    const encodedCreds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
+    const headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Basic ${encodedCreds}`
+    };
+    const body = new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: refresh_token
+    });
+
+    try {
+        const response = await fetch(`${baseURL}/access_token`,{
+            method: "POST",
+            headers: headers,
+            body: body.toString()
+        });
+        if (response.ok){
+            const jsonResponse = await response.json();
+            storeTokens(jsonResponse);
+        }
+    } catch (error) {
+        console.log("Error refreshing the token ", error);
+    }
+}
+
+export function isTokenExpired() {
+    const expiry = localStorage.getItem('reddit_token_expiry');
+    return !expiry || Date.now() > Number(expiry);
+}
+
+export async function getValidAccessToken() {
+    if (isTokenExpired()) {
+        await refreshAccessToken();
+    }
+    return localStorage.getItem('reddit_access_token');
+}
