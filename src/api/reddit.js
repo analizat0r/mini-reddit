@@ -61,7 +61,10 @@ export async function handleRedirectCallback() {
 
 export async function refreshAccessToken() {
     const refresh_token = localStorage.getItem('reddit_refresh_token');
-    if (!refresh_token) return;
+    if (!refresh_token) {
+        redirectToReddit();
+        return
+    };
     
     const encodedCreds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
     const headers = {
