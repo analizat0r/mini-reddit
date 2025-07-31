@@ -63,7 +63,7 @@ export async function refreshAccessToken() {
     const refresh_token = localStorage.getItem('reddit_refresh_token');
     if (!refresh_token) {
         redirectToReddit();
-        return
+        return;
     };
     
     const encodedCreds = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
